@@ -1,35 +1,18 @@
 #!/usr/bin/python
 import git
-from collections import namedtuple
+import networkx as nx
 
-Col = namedtuple('Col', ['width'])
-cols = []
-
+#git --git-dir=somewhere.git rev-list --parents --branches --tags --remotes > git.adjlist
+#optional - shorten hashes: sed -ir 's/([a-zA-Z0-9]{6})[a-zA-Z0-9]*/\1/g' git.adjlist
+#python visualize.py <(head -n100 git.adjlist)
+#dot git.dot -Tpng -o git.png
+#open git.png
 def load(path):
-  nodes = {}
-  to_traverse = [git.Repo(path).head.commit]
-
-  while to_traverse:
-    current = to_traverse.pop()
-    if current.name_rev[:6] not in nodes:
-      nodes[current.name_rev[:6]] = [c.name_rev[:6] for c in current.parents]
-    else:
-      raise Exception('Loop detected!')
-    if current.parents:
-      #to_traverse.append(current.parents[0])
-      to_traverse.extend(current.parents)
-      #watch out, there's a loop!
-
-  return nodes
+  hist = nx.read_adjlist(path, create_using=nx.DiGraph())
+  nx.write_dot(hist, 'git.dot')
 
 
 if __name__ == '__main__':
   import sys
-  nodes = load(sys.argv[1])
-  current, parents = nodes.popitem()
-  while parents:
-    current = parents[0]
-    parents = nodes[current]
-  
-  print current
+  load(sys.argv[1])
 
