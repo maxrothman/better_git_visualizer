@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 #perhaps this would be easier to prototype with ipython
 
-#git --git-dir=somewhere.git rev-list --parents --branches --tags --remotes > git.adjlist
+#git -C somewhere.git rev-list --parents --branches --tags --remotes > git.adjlist
 #optional - shorten hashes: sed -i 's/\([a-zA-Z0-9]\{6\}\)[a-zA-Z0-9]*/\1/g' git.adjlist
 #python visualize.py <(head -n100 git.adjlist)
 #dot git.dot -Tpng -o git.png

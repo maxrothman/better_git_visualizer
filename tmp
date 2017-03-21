@@ -1,0 +1,44 @@
+import git
+
+class Node(object):
+    def __init__(self, commit):
+        self.commit = commit
+        assert 1 <= len(commit.parents) <= 2
+        self.parents = commit.parents
+        self.hash = commit.hexsha
+    def __repr__(self):
+        return self.hash[:6]
+        
+
+class Graph(object):
+    def __init__(self, nodes):
+        self.nodes = {node.hash: node for node in nodes}
+    def add_node(self, commit):
+        node = Node(commit)
+        if node.hash in self.nodes:
+            raise AttributeError("Commit {} is already in the graph".format(hash))
+        self.nodes[node.hash] = node
+        return node
+
+repo = git.Repo('/Users/max/repos/configuration')
+graph = Graph([])
+commit = repo.refs.master.commit
+node = graph.add_node(commit)
+stack = [node]
+visited = []
+done = False
+while stack:
+    if done: break
+    node = stack.pop()
+    for _ in range(10):
+        parent = node.parents[0]
+        if parent.hexsha in graph.nodes:
+            break
+        elif len(node.parents) > 1:
+            # We want the leftmost parent at the top of the stack
+            stack += [graph.add_node(p) for p in node.parents[1:] if p.hexsha not in graph.nodes]
+        elif len(parent.parents) == 0:
+            done = True
+            break
+        
+        node = graph.add_node(parent)
